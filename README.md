@@ -2,11 +2,11 @@
 
 ## Overview
 
-Indian Trade Hub is a comprehensive blockchain-based solution designed to address the significant challenges faced by Indian businesses engaged in import-export activities. The platform streamlines global trade processes by enabling secure, transparent, and efficient cross-border transactions while ensuring compliance with global trade and ESG (Environmental, Social, and Governance) standards.
+Trade Hub is a comprehensive blockchain-based solution designed to address the significant challenges faced by Indian businesses engaged in import-export activities. The platform streamlines global trade processes by enabling secure, transparent, and efficient cross-border transactions while ensuring compliance with global trade and ESG (Environmental, Social, and Governance) standards.
 
 ## Problem Statement
 
-Indian businesses engaged in import-export activities face significant challenges in achieving fast, cost-effective, and compliant cross-border transactions that align with WTO regulations and ESG standards. Existing trade systems often lack the necessary transparency, traceability, and automation, leading to:
+businesses engaged in import-export activities face significant challenges in achieving fast, cost-effective, and compliant cross-border transactions that align with WTO regulations and ESG standards. Existing trade systems often lack the necessary transparency, traceability, and automation, leading to:
 
 - Delays in trade processing
 - Increased operational costs
@@ -16,7 +16,7 @@ Indian businesses engaged in import-export activities face significant challenge
 
 ## Solution
 
-Indian Trade Hub provides a Consortium Blockchain-based solution that addresses these inefficiencies through:
+Trade Hub provides a Consortium Blockchain-based solution that addresses these inefficiencies through:
 
 ### Key Functionalities
 
