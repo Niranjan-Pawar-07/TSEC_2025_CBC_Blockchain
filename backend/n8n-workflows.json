@@ -1,0 +1,837 @@
+{
+  "workflows": {
+    "compliance_validation": {
+      "name": "WTO Compliance Validation",
+      "description": "Validates trade agreements against WTO regulations and Indian trade policies",
+      "nodes": [
+        {
+          "id": "webhook_trigger",
+          "type": "webhook",
+          "name": "Compliance Validation Trigger",
+          "parameters": {
+            "httpMethod": "POST",
+            "path": "compliance-validation",
+            "responseMode": "responseNode"
+          }
+        },
+        {
+          "id": "data_extraction",
+          "type": "function",
+          "name": "Extract Trade Data",
+          "parameters": {
+            "functionCode": `
+              const data = $input.first().json.data;
+              return {
+                agreementId: data.agreementId,
+                goodsDescription: data.goodsDescription,
+                originCountry: data.originCountry,
+                destinationCountry: data.destinationCountry,
+                amount: data.amount,
+                incoterms: data.incoterms
+              };
+            `
+          }
+        },
+        {
+          "id": "wto_check",
+          "type": "http_request",
+          "name": "WTO Database Check",
+          "parameters": {
+            "url": "https://api.wto.org/v1/tariffs",
+            "method": "GET",
+            "authentication": "genericCredentialType",
+            "genericAuthType": "httpHeaderAuth",
+            "sendHeaders": true,
+            "headerParameters": {
+              "parameters": [
+                {
+                  "name": "Authorization",
+                  "value": "Bearer {{$env.WTO_API_KEY}}"
+                }
+              ]
+            }
+          }
+        },
+        {
+          "id": "india_policy_check",
+          "type": "http_request",
+          "name": "Indian Trade Policy Check",
+          "parameters": {
+            "url": "https://api.dgft.gov.in/v1/policies",
+            "method": "GET",
+            "sendHeaders": true,
+            "headerParameters": {
+              "parameters": [
+                {
+                  "name": "Authorization",
+                  "value": "Bearer {{$env.DGFT_API_KEY}}"
+                }
+              ]
+            }
+          }
+        },
+        {
+          "id": "compliance_analysis",
+          "type": "function",
+          "name": "Compliance Analysis",
+          "parameters": {
+            "functionCode": `
+              const tradeData = $('data_extraction').first().json;
+              const wtoData = $('wto_check').first().json;
+              const indiaPolicy = $('india_policy_check').first().json;
+              
+              let complianceScore = 100;
+              const issues = [];
+              const recommendations = [];
+              
+              // Check WTO compliance
+              if (wtoData.restrictions && wtoData.restrictions.length > 0) {
+                complianceScore -= 20;
+                issues.push('WTO restrictions detected');
+              }
+              
+              // Check Indian trade policies
+              if (indiaPolicy.requiresLicense) {
+                complianceScore -= 15;
+                issues.push('Import/Export license required');
+                recommendations.push('Apply for necessary licenses');
+              }
+              
+              // Check amount thresholds
+              if (tradeData.amount > 1000000) {
+                complianceScore -= 10;
+                issues.push('High-value transaction requires additional scrutiny');
+                recommendations.push('Prepare detailed documentation');
+              }
+              
+              // Check origin verification
+              if (tradeData.originCountry === 'India') {
+                complianceScore += 5;
+                recommendations.push('Origin certificates required');
+              }
+              
+              return {
+                isCompliant: complianceScore >= 70,
+                score: complianceScore,
+                details: {
+                  tariffCompliance: wtoData.tariffCompliant,
+                  originVerification: true,
+                  regulatoryCompliance: indiaPolicy.compliant,
+                  documentationComplete: true
+                },
+                issues,
+                recommendations,
+                risks: [
+                  'Potential delays in customs clearance',
+                  'Documentation requirements may change'
+                ]
+              };
+            `
+          }
+        },
+        {
+          "id": "response",
+          "type": "respond_to_webhook",
+          "name": "Send Response",
+          "parameters": {
+            "responseBody": "={{ $('compliance_analysis').first().json }}"
+          }
+        }
+      ],
+      "connections": {
+        "webhook_trigger": {
+          "main": [["data_extraction"]]
+        },
+        "data_extraction": {
+          "main": [["wto_check"], ["india_policy_check"]]
+        },
+        "wto_check": {
+          "main": [["compliance_analysis"]]
+        },
+        "india_policy_check": {
+          "main": [["compliance_analysis"]]
+        },
+        "compliance_analysis": {
+          "main": [["response"]]
+        }
+      }
+    },
+    "esg_analysis": {
+      "name": "ESG Analysis",
+      "description": "Analyzes environmental, social, and governance factors for trade agreements",
+      "nodes": [
+        {
+          "id": "webhook_trigger",
+          "type": "webhook",
+          "name": "ESG Analysis Trigger",
+          "parameters": {
+            "httpMethod": "POST",
+            "path": "esg-analysis",
+            "responseMode": "responseNode"
+          }
+        },
+        {
+          "id": "data_extraction",
+          "type": "function",
+          "name": "Extract ESG Data",
+          "parameters": {
+            "functionCode": `
+              const data = $input.first().json.data;
+              return {
+                agreementId: data.agreementId,
+                goodsDescription: data.goodsDescription,
+                originCountry: data.originCountry,
+                destinationCountry: data.destinationCountry,
+                amount: data.amount
+              };
+            `
+          }
+        },
+        {
+          "id": "environmental_check",
+          "type": "http_request",
+          "name": "Environmental Impact Check",
+          "parameters": {
+            "url": "https://api.epa.gov/v1/environmental-impact",
+            "method": "POST",
+            "sendBody": true,
+            "bodyParameters": {
+              "parameters": [
+                {
+                  "name": "goods",
+                  "value": "={{ $('data_extraction').first().json.goodsDescription }}"
+                },
+                {
+                  "name": "origin",
+                  "value": "={{ $('data_extraction').first().json.originCountry }}"
+                }
+              ]
+            }
+          }
+        },
+        {
+          "id": "social_check",
+          "type": "http_request",
+          "name": "Social Compliance Check",
+          "parameters": {
+            "url": "https://api.ilo.org/v1/labor-standards",
+            "method": "GET",
+            "sendHeaders": true,
+            "headerParameters": {
+              "parameters": [
+                {
+                  "name": "country",
+                  "value": "={{ $('data_extraction').first().json.originCountry }}"
+                }
+              ]
+            }
+          }
+        },
+        {
+          "id": "governance_check",
+          "type": "http_request",
+          "name": "Governance Standards Check",
+          "parameters": {
+            "url": "https://api.transparency.org/v1/corruption-index",
+            "method": "GET",
+            "sendHeaders": true,
+            "headerParameters": {
+              "parameters": [
+                {
+                  "name": "country",
+                  "value": "={{ $('data_extraction').first().json.originCountry }}"
+                }
+              ]
+            }
+          }
+        },
+        {
+          "id": "esg_calculation",
+          "type": "function",
+          "name": "ESG Score Calculation",
+          "parameters": {
+            "functionCode": `
+              const tradeData = $('data_extraction').first().json;
+              const environmental = $('environmental_check').first().json;
+              const social = $('social_check').first().json;
+              const governance = $('governance_check').first().json;
+              
+              let environmentalScore = 75;
+              let socialScore = 80;
+              let governanceScore = 85;
+              
+              // Environmental scoring
+              if (environmental.carbonFootprint < 100) environmentalScore += 15;
+              else if (environmental.carbonFootprint > 500) environmentalScore -= 20;
+              
+              if (environmental.renewableEnergy > 80) environmentalScore += 10;
+              else if (environmental.renewableEnergy < 20) environmentalScore -= 15;
+              
+              // Social scoring
+              if (social.laborCompliance > 90) socialScore += 15;
+              else if (social.laborCompliance < 60) socialScore -= 20;
+              
+              if (social.fairTrade) socialScore += 10;
+              
+              // Governance scoring
+              if (governance.corruptionIndex < 30) governanceScore += 15;
+              else if (governance.corruptionIndex > 70) governanceScore -= 20;
+              
+              if (governance.transparency > 80) governanceScore += 10;
+              
+              const overallScore = Math.round((environmentalScore + socialScore + governanceScore) / 3);
+              
+              return {
+                environmentalScore,
+                socialScore,
+                governanceScore,
+                overallScore,
+                recommendations: [
+                  'Consider carbon offset programs',
+                  'Implement sustainable packaging',
+                  'Verify labor standards compliance',
+                  'Ensure transparent business practices'
+                ],
+                certifications: [
+                  'ISO 14001 (Environmental Management)',
+                  'Fair Trade Certification',
+                  'Organic Certification',
+                  'FSC (Forest Stewardship Council)'
+                ]
+              };
+            `
+          }
+        },
+        {
+          "id": "response",
+          "type": "respond_to_webhook",
+          "name": "Send Response",
+          "parameters": {
+            "responseBody": "={{ $('esg_calculation').first().json }}"
+          }
+        }
+      ],
+      "connections": {
+        "webhook_trigger": {
+          "main": [["data_extraction"]]
+        },
+        "data_extraction": {
+          "main": [["environmental_check"], ["social_check"], ["governance_check"]]
+        },
+        "environmental_check": {
+          "main": [["esg_calculation"]]
+        },
+        "social_check": {
+          "main": [["esg_calculation"]]
+        },
+        "governance_check": {
+          "main": [["esg_calculation"]]
+        },
+        "esg_calculation": {
+          "main": [["response"]]
+        }
+      }
+    },
+    "risk_assessment": {
+      "name": "Risk Assessment",
+      "description": "Assesses various risks associated with trade agreements",
+      "nodes": [
+        {
+          "id": "webhook_trigger",
+          "type": "webhook",
+          "name": "Risk Assessment Trigger",
+          "parameters": {
+            "httpMethod": "POST",
+            "path": "risk-assessment",
+            "responseMode": "responseNode"
+          }
+        },
+        {
+          "id": "data_extraction",
+          "type": "function",
+          "name": "Extract Risk Data",
+          "parameters": {
+            "functionCode": `
+              const data = $input.first().json.data;
+              return {
+                agreementId: data.agreementId,
+                importer: data.importer,
+                exporter: data.exporter,
+                amount: data.amount,
+                goodsDescription: data.goodsDescription,
+                originCountry: data.originCountry,
+                destinationCountry: data.destinationCountry
+              };
+            `
+          }
+        },
+        {
+          "id": "country_risk",
+          "type": "http_request",
+          "name": "Country Risk Analysis",
+          "parameters": {
+            "url": "https://api.worldbank.org/v2/country/risk-assessment",
+            "method": "GET",
+            "sendHeaders": true,
+            "headerParameters": {
+              "parameters": [
+                {
+                  "name": "countries",
+                  "value": "={{ $('data_extraction').first().json.originCountry }},{{ $('data_extraction').first().json.destinationCountry }}"
+                }
+              ]
+            }
+          }
+        },
+        {
+          "id": "counterparty_risk",
+          "type": "http_request",
+          "name": "Counterparty Risk Check",
+          "parameters": {
+            "url": "https://api.credit-rating.com/v1/assessment",
+            "method": "POST",
+            "sendBody": true,
+            "bodyParameters": {
+              "parameters": [
+                {
+                  "name": "importer",
+                  "value": "={{ $('data_extraction').first().json.importer }}"
+                },
+                {
+                  "name": "exporter",
+                  "value": "={{ $('data_extraction').first().json.exporter }}"
+                }
+              ]
+            }
+          }
+        },
+        {
+          "id": "market_risk",
+          "type": "http_request",
+          "name": "Market Risk Analysis",
+          "parameters": {
+            "url": "https://api.market-data.com/v1/volatility",
+            "method": "GET",
+            "sendHeaders": true,
+            "headerParameters": {
+              "parameters": [
+                {
+                  "name": "commodity",
+                  "value": "={{ $('data_extraction').first().json.goodsDescription }}"
+                }
+              ]
+            }
+          }
+        },
+        {
+          "id": "risk_calculation",
+          "type": "function",
+          "name": "Risk Score Calculation",
+          "parameters": {
+            "functionCode": `
+              const tradeData = $('data_extraction').first().json;
+              const countryRisk = $('country_risk').first().json;
+              const counterpartyRisk = $('counterparty_risk').first().json;
+              const marketRisk = $('market_risk').first().json;
+              
+              let overallRisk = 'medium';
+              let riskScore = 65;
+              
+              // Country risk assessment
+              const originRisk = countryRisk.risks[tradeData.originCountry] || 'medium';
+              const destRisk = countryRisk.risks[tradeData.destinationCountry] || 'medium';
+              
+              if (originRisk === 'high' || destRisk === 'high') {
+                riskScore += 20;
+                overallRisk = 'high';
+              } else if (originRisk === 'low' && destRisk === 'low') {
+                riskScore -= 15;
+                overallRisk = 'low';
+              }
+              
+              // Counterparty risk
+              const importerRisk = counterpartyRisk.ratings[tradeData.importer] || 'medium';
+              const exporterRisk = counterpartyRisk.ratings[tradeData.exporter] || 'medium';
+              
+              if (importerRisk === 'low' && exporterRisk === 'low') {
+                riskScore -= 10;
+              } else if (importerRisk === 'high' || exporterRisk === 'high') {
+                riskScore += 15;
+                overallRisk = 'high';
+              }
+              
+              // Market risk
+              if (marketRisk.volatility > 0.3) {
+                riskScore += 10;
+                overallRisk = 'high';
+              } else if (marketRisk.volatility < 0.1) {
+                riskScore -= 5;
+              }
+              
+              // Amount-based risk
+              if (tradeData.amount > 1000000) {
+                riskScore += 15;
+                overallRisk = 'high';
+              }
+              
+              return {
+                overallRisk,
+                score: Math.min(100, Math.max(0, riskScore)),
+                factors: {
+                  countryRisk: originRisk === 'high' || destRisk === 'high' ? 'high' : 'low',
+                  counterpartyRisk: importerRisk === 'high' || exporterRisk === 'high' ? 'high' : 'medium',
+                  marketRisk: marketRisk.volatility > 0.3 ? 'high' : 'medium',
+                  regulatoryRisk: 'low'
+                },
+                recommendations: [
+                  'Monitor exchange rate fluctuations',
+                  'Verify counterparty credentials',
+                  'Consider trade insurance',
+                  'Implement payment terms'
+                ],
+                mitigation: [
+                  'Use escrow services',
+                  'Implement payment terms',
+                  'Regular monitoring',
+                  'Diversify suppliers'
+                ]
+              };
+            `
+          }
+        },
+        {
+          "id": "response",
+          "type": "respond_to_webhook",
+          "name": "Send Response",
+          "parameters": {
+            "responseBody": "={{ $('risk_calculation').first().json }}"
+          }
+        }
+      ],
+      "connections": {
+        "webhook_trigger": {
+          "main": [["data_extraction"]]
+        },
+        "data_extraction": {
+          "main": [["country_risk"], ["counterparty_risk"], ["market_risk"]]
+        },
+        "country_risk": {
+          "main": [["risk_calculation"]]
+        },
+        "counterparty_risk": {
+          "main": [["risk_calculation"]]
+        },
+        "market_risk": {
+          "main": [["risk_calculation"]]
+        },
+        "risk_calculation": {
+          "main": [["response"]]
+        }
+      }
+    },
+    "trade_recommendations": {
+      "name": "Trade Recommendations",
+      "description": "Generates intelligent recommendations for trade optimization",
+      "nodes": [
+        {
+          "id": "webhook_trigger",
+          "type": "webhook",
+          "name": "Trade Recommendations Trigger",
+          "parameters": {
+            "httpMethod": "POST",
+            "path": "trade-recommendations",
+            "responseMode": "responseNode"
+          }
+        },
+        {
+          "id": "data_extraction",
+          "type": "function",
+          "name": "Extract Trade Data",
+          "parameters": {
+            "functionCode": `
+              const data = $input.first().json.data;
+              return {
+                agreementId: data.agreementId,
+                goodsDescription: data.goodsDescription,
+                amount: data.amount,
+                originCountry: data.originCountry,
+                destinationCountry: data.destinationCountry
+              };
+            `
+          }
+        },
+        {
+          "id": "market_analysis",
+          "type": "http_request",
+          "name": "Market Analysis",
+          "parameters": {
+            "url": "https://api.trade-intelligence.com/v1/market-analysis",
+            "method": "POST",
+            "sendBody": true,
+            "bodyParameters": {
+              "parameters": [
+                {
+                  "name": "commodity",
+                  "value": "={{ $('data_extraction').first().json.goodsDescription }}"
+                },
+                {
+                  "name": "origin",
+                  "value": "={{ $('data_extraction').first().json.originCountry }}"
+                },
+                {
+                  "name": "destination",
+                  "value": "={{ $('data_extraction').first().json.destinationCountry }}"
+                }
+              ]
+            }
+          }
+        },
+        {
+          "id": "cost_optimization",
+          "type": "http_request",
+          "name": "Cost Optimization Analysis",
+          "parameters": {
+            "url": "https://api.logistics.com/v1/cost-optimization",
+            "method": "POST",
+            "sendBody": true,
+            "bodyParameters": {
+              "parameters": [
+                {
+                  "name": "route",
+                  "value": "={{ $('data_extraction').first().json.originCountry }} to {{ $('data_extraction').first().json.destinationCountry }}"
+                },
+                {
+                  "name": "amount",
+                  "value": "={{ $('data_extraction').first().json.amount }}"
+                }
+              ]
+            }
+          }
+        },
+        {
+          "id": "recommendations_generation",
+          "type": "function",
+          "name": "Generate Recommendations",
+          "parameters": {
+            "functionCode": `
+              const tradeData = $('data_extraction').first().json;
+              const marketAnalysis = $('market_analysis').first().json;
+              const costOptimization = $('cost_optimization').first().json;
+              
+              const recommendations = {
+                tradeOptimization: [],
+                compliance: [],
+                riskManagement: [],
+                sustainability: []
+              };
+              
+              // Trade optimization recommendations
+              if (costOptimization.bulkShipping) {
+                recommendations.tradeOptimization.push('Consider bulk shipping for cost reduction');
+              }
+              
+              if (costOptimization.alternativeRoutes) {
+                recommendations.tradeOptimization.push('Explore alternative shipping routes');
+              }
+              
+              if (marketAnalysis.paymentTerms) {
+                recommendations.tradeOptimization.push('Negotiate better payment terms');
+              }
+              
+              // Compliance recommendations
+              recommendations.compliance.push('Ensure all regulatory requirements are met');
+              recommendations.compliance.push('Maintain proper documentation');
+              recommendations.compliance.push('Regular compliance audits');
+              
+              // Risk management recommendations
+              recommendations.riskManagement.push('Implement trade insurance');
+              recommendations.riskManagement.push('Use secure payment methods');
+              recommendations.riskManagement.push('Monitor market conditions');
+              
+              // Sustainability recommendations
+              recommendations.sustainability.push('Choose eco-friendly packaging');
+              recommendations.sustainability.push('Optimize transportation routes');
+              recommendations.sustainability.push('Partner with sustainable suppliers');
+              
+              return recommendations;
+            `
+          }
+        },
+        {
+          "id": "response",
+          "type": "respond_to_webhook",
+          "name": "Send Response",
+          "parameters": {
+            "responseBody": "={{ $('recommendations_generation').first().json }}"
+          }
+        }
+      ],
+      "connections": {
+        "webhook_trigger": {
+          "main": [["data_extraction"]]
+        },
+        "data_extraction": {
+          "main": [["market_analysis"], ["cost_optimization"]]
+        },
+        "market_analysis": {
+          "main": [["recommendations_generation"]]
+        },
+        "cost_optimization": {
+          "main": [["recommendations_generation"]]
+        },
+        "recommendations_generation": {
+          "main": [["response"]]
+        }
+      }
+    },
+    "market_insights": {
+      "name": "Market Insights",
+      "description": "Provides market intelligence and trends for trade decisions",
+      "nodes": [
+        {
+          "id": "webhook_trigger",
+          "type": "webhook",
+          "name": "Market Insights Trigger",
+          "parameters": {
+            "httpMethod": "POST",
+            "path": "market-insights",
+            "responseMode": "responseNode"
+          }
+        },
+        {
+          "id": "data_extraction",
+          "type": "function",
+          "name": "Extract Market Data",
+          "parameters": {
+            "functionCode": `
+              const data = $input.first().json.data;
+              return {
+                goodsDescription: data.goodsDescription,
+                originCountry: data.originCountry,
+                destinationCountry: data.destinationCountry,
+                amount: data.amount
+              };
+            `
+          }
+        },
+        {
+          "id": "trend_analysis",
+          "type": "http_request",
+          "name": "Market Trend Analysis",
+          "parameters": {
+            "url": "https://api.market-research.com/v1/trends",
+            "method": "GET",
+            "sendHeaders": true,
+            "headerParameters": {
+              "parameters": [
+                {
+                  "name": "sector",
+                  "value": "={{ $('data_extraction').first().json.goodsDescription }}"
+                }
+              ]
+            }
+          }
+        },
+        {
+          "id": "opportunity_analysis",
+          "type": "http_request",
+          "name": "Opportunity Analysis",
+          "parameters": {
+            "url": "https://api.trade-opportunities.com/v1/analysis",
+            "method": "POST",
+            "sendBody": true,
+            "bodyParameters": {
+              "parameters": [
+                {
+                  "name": "markets",
+                  "value": "={{ $('data_extraction').first().json.destinationCountry }}"
+                },
+                {
+                  "name": "products",
+                  "value": "={{ $('data_extraction').first().json.goodsDescription }}"
+                }
+              ]
+            }
+          }
+        },
+        {
+          "id": "insights_generation",
+          "type": "function",
+          "name": "Generate Market Insights",
+          "parameters": {
+            "functionCode": `
+              const tradeData = $('data_extraction').first().json;
+              const trends = $('trend_analysis').first().json;
+              const opportunities = $('opportunity_analysis').first().json;
+              
+              return {
+                marketTrends: [
+                  'Growing demand for sustainable products',
+                  'Digital trade platforms gaining popularity',
+                  'Increased focus on supply chain transparency',
+                  'Rising importance of ESG compliance'
+                ],
+                opportunities: [
+                  'Expand to emerging markets',
+                  'Develop digital trade capabilities',
+                  'Focus on ESG-compliant products',
+                  'Leverage blockchain for transparency'
+                ],
+                challenges: [
+                  'Regulatory complexity',
+                  'Currency fluctuations',
+                  'Supply chain disruptions',
+                  'Competition from digital platforms'
+                ],
+                forecasts: {
+                  shortTerm: 'Stable growth expected in next 6 months',
+                  mediumTerm: 'Digital transformation accelerating over 1-2 years',
+                  longTerm: 'Sustainability becoming key differentiator in 3-5 years'
+                }
+              };
+            `
+          }
+        },
+        {
+          "id": "response",
+          "type": "respond_to_webhook",
+          "name": "Send Response",
+          "parameters": {
+            "responseBody": "={{ $('insights_generation').first().json }}"
+          }
+        }
+      ],
+      "connections": {
+        "webhook_trigger": {
+          "main": [["data_extraction"]]
+        },
+        "data_extraction": {
+          "main": [["trend_analysis"], ["opportunity_analysis"]]
+        },
+        "trend_analysis": {
+          "main": [["insights_generation"]]
+        },
+        "opportunity_analysis": {
+          "main": [["insights_generation"]]
+        },
+        "insights_generation": {
+          "main": [["response"]]
+        }
+      }
+    }
+  },
+  "environment": {
+    "WTO_API_KEY": "{{$env.WTO_API_KEY}}",
+    "DGFT_API_KEY": "{{$env.DGFT_API_KEY}}",
+    "EPA_API_KEY": "{{$env.EPA_API_KEY}}",
+    "ILO_API_KEY": "{{$env.ILO_API_KEY}}",
+    "TRANSPARENCY_API_KEY": "{{$env.TRANSPARENCY_API_KEY}}",
+    "WORLDBANK_API_KEY": "{{$env.WORLDBANK_API_KEY}}",
+    "CREDIT_RATING_API_KEY": "{{$env.CREDIT_RATING_API_KEY}}",
+    "MARKET_DATA_API_KEY": "{{$env.MARKET_DATA_API_KEY}}",
+    "TRADE_INTELLIGENCE_API_KEY": "{{$env.TRADE_INTELLIGENCE_API_KEY}}",
+    "LOGISTICS_API_KEY": "{{$env.LOGISTICS_API_KEY}}",
+    "MARKET_RESEARCH_API_KEY": "{{$env.MARKET_RESEARCH_API_KEY}}",
+    "TRADE_OPPORTUNITIES_API_KEY": "{{$env.TRADE_OPPORTUNITIES_API_KEY}}"
+  }
+} 

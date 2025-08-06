@@ -1,0 +1,273 @@
+{
+  "agreements": [
+    {
+      "id": "test-1754445270581",
+      "importer": "0x1234567890123456789012345678901234567890",
+      "exporter": "0x0987654321098765432109876543210987654321",
+      "goodsDescription": "Test Electronics - Smartphones",
+      "originCountry": "China",
+      "destinationCountry": "India",
+      "amount": "50000",
+      "incoterms": "CIF",
+      "status": "pending",
+      "timestamp": "2025-08-06T01:54:30.581Z",
+      "createdAt": "2025-08-06T01:54:30.581Z",
+      "blockchainTx": null,
+      "auditTrail": []
+    }
+  ],
+  "esgMetrics": {},
+  "complianceReports": [],
+  "participants": {},
+  "documents": {},
+  "aiInsights": [
+    {
+      "id": "84f0bd1085b3a0f14031f858c468ff8c",
+      "type": "trade_agreement_analysis",
+      "agreementId": "test-1754445270581",
+      "analysis": {
+        "agreementId": "test-1754445270581",
+        "timestamp": "2025-08-06T01:54:30.587Z",
+        "compliance": {
+          "isCompliant": true,
+          "score": 85,
+          "details": {
+            "tariffCompliance": true,
+            "originVerification": true,
+            "regulatoryCompliance": true,
+            "documentationComplete": true
+          },
+          "recommendations": [
+            "Ensure all required documents are uploaded",
+            "Verify origin certificates are valid",
+            "Check tariff classifications"
+          ],
+          "risks": [
+            "Potential delays in customs clearance",
+            "Documentation requirements may change"
+          ]
+        },
+        "riskAssessment": {
+          "overallRisk": "medium",
+          "score": 65,
+          "factors": {
+            "countryRisk": "low",
+            "counterpartyRisk": "medium",
+            "marketRisk": "medium",
+            "regulatoryRisk": "low"
+          },
+          "recommendations": [
+            "Monitor exchange rate fluctuations",
+            "Verify counterparty credentials",
+            "Consider trade insurance"
+          ],
+          "mitigation": [
+            "Use escrow services",
+            "Implement payment terms",
+            "Regular monitoring"
+          ]
+        },
+        "esgAnalysis": {
+          "environmentalScore": 75,
+          "socialScore": 80,
+          "governanceScore": 85,
+          "overallScore": 80,
+          "recommendations": [
+            "Consider carbon offset programs",
+            "Implement sustainable packaging",
+            "Verify labor standards compliance"
+          ],
+          "certifications": [
+            "ISO 14001 (Environmental Management)",
+            "Fair Trade Certification",
+            "Organic Certification"
+          ]
+        },
+        "recommendations": {
+          "tradeOptimization": [
+            "Consider bulk shipping for cost reduction",
+            "Explore alternative payment terms",
+            "Negotiate better freight rates"
+          ],
+          "compliance": [
+            "Ensure all regulatory requirements are met",
+            "Maintain proper documentation",
+            "Regular compliance audits"
+          ],
+          "riskManagement": [
+            "Implement trade insurance",
+            "Use secure payment methods",
+            "Monitor market conditions"
+          ],
+          "sustainability": [
+            "Choose eco-friendly packaging",
+            "Optimize transportation routes",
+            "Partner with sustainable suppliers"
+          ]
+        },
+        "marketInsights": {
+          "marketTrends": [
+            "Growing demand for sustainable products",
+            "Digital trade platforms gaining popularity",
+            "Increased focus on supply chain transparency"
+          ],
+          "opportunities": [
+            "Expand to emerging markets",
+            "Develop digital trade capabilities",
+            "Focus on ESG-compliant products"
+          ],
+          "challenges": [
+            "Regulatory complexity",
+            "Currency fluctuations",
+            "Supply chain disruptions"
+          ],
+          "forecasts": {
+            "shortTerm": "Stable growth expected",
+            "mediumTerm": "Digital transformation accelerating",
+            "longTerm": "Sustainability becoming key differentiator"
+          }
+        }
+      },
+      "status": "completed",
+      "createdAt": "2025-08-06T01:54:32.465Z"
+    }
+  ],
+  "analytics": {},
+  "auditLog": [
+    {
+      "id": "50c488952d69daf2fc165926b096a2a6",
+      "action": "agreement_created",
+      "entityId": "test-1754445270581",
+      "data": {
+        "id": "test-1754445270581",
+        "importer": "0x1234567890123456789012345678901234567890",
+        "exporter": "0x0987654321098765432109876543210987654321",
+        "goodsDescription": "Test Electronics - Smartphones",
+        "originCountry": "China",
+        "destinationCountry": "India",
+        "amount": "50000",
+        "incoterms": "CIF",
+        "status": "pending",
+        "timestamp": "2025-08-06T01:54:30.581Z"
+      },
+      "timestamp": "2025-08-06T01:54:30.581Z",
+      "userId": "system"
+    },
+    {
+      "id": "d838f0fce501499af94b113d22bd056d",
+      "action": "ai_insight_created",
+      "entityId": "84f0bd1085b3a0f14031f858c468ff8c",
+      "data": {
+        "type": "trade_agreement_analysis",
+        "agreementId": "test-1754445270581",
+        "analysis": {
+          "agreementId": "test-1754445270581",
+          "timestamp": "2025-08-06T01:54:30.587Z",
+          "compliance": {
+            "isCompliant": true,
+            "score": 85,
+            "details": {
+              "tariffCompliance": true,
+              "originVerification": true,
+              "regulatoryCompliance": true,
+              "documentationComplete": true
+            },
+            "recommendations": [
+              "Ensure all required documents are uploaded",
+              "Verify origin certificates are valid",
+              "Check tariff classifications"
+            ],
+            "risks": [
+              "Potential delays in customs clearance",
+              "Documentation requirements may change"
+            ]
+          },
+          "riskAssessment": {
+            "overallRisk": "medium",
+            "score": 65,
+            "factors": {
+              "countryRisk": "low",
+              "counterpartyRisk": "medium",
+              "marketRisk": "medium",
+              "regulatoryRisk": "low"
+            },
+            "recommendations": [
+              "Monitor exchange rate fluctuations",
+              "Verify counterparty credentials",
+              "Consider trade insurance"
+            ],
+            "mitigation": [
+              "Use escrow services",
+              "Implement payment terms",
+              "Regular monitoring"
+            ]
+          },
+          "esgAnalysis": {
+            "environmentalScore": 75,
+            "socialScore": 80,
+            "governanceScore": 85,
+            "overallScore": 80,
+            "recommendations": [
+              "Consider carbon offset programs",
+              "Implement sustainable packaging",
+              "Verify labor standards compliance"
+            ],
+            "certifications": [
+              "ISO 14001 (Environmental Management)",
+              "Fair Trade Certification",
+              "Organic Certification"
+            ]
+          },
+          "recommendations": {
+            "tradeOptimization": [
+              "Consider bulk shipping for cost reduction",
+              "Explore alternative payment terms",
+              "Negotiate better freight rates"
+            ],
+            "compliance": [
+              "Ensure all regulatory requirements are met",
+              "Maintain proper documentation",
+              "Regular compliance audits"
+            ],
+            "riskManagement": [
+              "Implement trade insurance",
+              "Use secure payment methods",
+              "Monitor market conditions"
+            ],
+            "sustainability": [
+              "Choose eco-friendly packaging",
+              "Optimize transportation routes",
+              "Partner with sustainable suppliers"
+            ]
+          },
+          "marketInsights": {
+            "marketTrends": [
+              "Growing demand for sustainable products",
+              "Digital trade platforms gaining popularity",
+              "Increased focus on supply chain transparency"
+            ],
+            "opportunities": [
+              "Expand to emerging markets",
+              "Develop digital trade capabilities",
+              "Focus on ESG-compliant products"
+            ],
+            "challenges": [
+              "Regulatory complexity",
+              "Currency fluctuations",
+              "Supply chain disruptions"
+            ],
+            "forecasts": {
+              "shortTerm": "Stable growth expected",
+              "mediumTerm": "Digital transformation accelerating",
+              "longTerm": "Sustainability becoming key differentiator"
+            }
+          }
+        },
+        "status": "completed"
+      },
+      "timestamp": "2025-08-06T01:54:32.465Z",
+      "userId": "system"
+    }
+  ],
+  "lastUpdated": "2025-08-06T01:54:32.465Z"
+}

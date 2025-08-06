@@ -1,0 +1,47 @@
+{
+  "agreements": [
+    {
+      "id": "test-1754445270581",
+      "importer": "0x1234567890123456789012345678901234567890",
+      "exporter": "0x0987654321098765432109876543210987654321",
+      "goodsDescription": "Test Electronics - Smartphones",
+      "originCountry": "China",
+      "destinationCountry": "India",
+      "amount": "50000",
+      "incoterms": "CIF",
+      "status": "pending",
+      "timestamp": "2025-08-06T01:54:30.581Z",
+      "createdAt": "2025-08-06T01:54:30.581Z",
+      "blockchainTx": null,
+      "auditTrail": []
+    }
+  ],
+  "esgMetrics": {},
+  "complianceReports": [],
+  "participants": {},
+  "documents": {},
+  "aiInsights": [],
+  "analytics": {},
+  "auditLog": [
+    {
+      "id": "50c488952d69daf2fc165926b096a2a6",
+      "action": "agreement_created",
+      "entityId": "test-1754445270581",
+      "data": {
+        "id": "test-1754445270581",
+        "importer": "0x1234567890123456789012345678901234567890",
+        "exporter": "0x0987654321098765432109876543210987654321",
+        "goodsDescription": "Test Electronics - Smartphones",
+        "originCountry": "China",
+        "destinationCountry": "India",
+        "amount": "50000",
+        "incoterms": "CIF",
+        "status": "pending",
+        "timestamp": "2025-08-06T01:54:30.581Z"
+      },
+      "timestamp": "2025-08-06T01:54:30.581Z",
+      "userId": "system"
+    }
+  ],
+  "lastUpdated": "2025-08-06T01:54:30.581Z"
+}
