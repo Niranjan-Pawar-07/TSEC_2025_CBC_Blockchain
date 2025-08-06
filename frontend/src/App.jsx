@@ -49,7 +49,7 @@ function App() {
                   </svg>
                 </div>
                 <h1 className="text-xl font-bold text-gray-800">
-                  Indian Trade Hub
+                  Trade Hub
                 </h1>
               </div>
               
