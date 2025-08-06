@@ -1,4 +1,4 @@
-# Indian Trade Hub - Blockchain-Powered Cross-Border Trade Platform
+# Trade Hub - Blockchain-Powered Cross-Border Trade Platform
 
 ## Overview
 
