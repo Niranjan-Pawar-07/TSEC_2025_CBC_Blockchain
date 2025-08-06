@@ -1,0 +1,43 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <link rel="icon" type="image/svg+xml" href="/vite.svg" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Cross-Border Trade System</title>
+    <!-- Add Tailwind CSS via CDN -->
+    <script src="https://cdn.tailwindcss.com"></script>
+    <!-- Add custom Tailwind configuration -->
+    <script>
+      tailwind.config = {
+        theme: {
+          extend: {},
+        },
+      }
+    </script>
+    <!-- Add custom styles -->
+    <style type="text/tailwind">
+      @layer components {
+        .btn {
+          @apply px-4 py-2 rounded-lg font-medium transition-colors duration-200;
+        }
+        .btn-primary {
+          @apply bg-blue-600 text-white hover:bg-blue-700;
+        }
+        .btn-secondary {
+          @apply bg-gray-200 text-gray-800 hover:bg-gray-300;
+        }
+        .input {
+          @apply w-full rounded-lg border-gray-300 shadow-sm focus:border-blue-500 focus:ring-blue-500;
+        }
+        .card {
+          @apply bg-white rounded-xl shadow-md p-6;
+        }
+      }
+    </style>
+  </head>
+  <body>
+    <div id="root"></div>
+    <script type="module" src="/src/main.jsx"></script>
+  </body>
+</html>
