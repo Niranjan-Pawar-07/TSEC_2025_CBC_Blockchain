@@ -124,7 +124,7 @@ function Dashboard({ contract, address }) {
       {/* Header */}
       <div className="text-center">
         <h1 className="text-3xl font-bold text-white mb-2">
-          Indian Trade Management System
+          Trade Management System
         </h1>
         <p className="text-white/80 text-lg">
           Streamlining cross-border transactions with blockchain technology
